@@ -34,6 +34,27 @@ return [
             'driver' => 'sync',
         ],
 
+        'rabbitmq' => [
+            'driver' => 'rabbitmq',
+            'host' => env('RABBITMQ_HOST', 'localhost'),
+            'port' => env('RABBITMQ_PORT', 5672),
+            'user' => env('RABBITMQ_USER', 'guest'),
+            'password' => env('RABBITMQ_PASSWORD', 'guest'),
+            'queue' => env('RABBITMQ_QUEUE', 'default'),
+            'vhost' => env('RABBITMQ_VHOST', '/'),
+            // Adicione outras opções se necessário, como exchange
+            'options' => [
+                'exchange' => [
+                    'name' => env('RABBITMQ_EXCHANGE_NAME', null),
+                    'type' => env('RABBITMQ_EXCHANGE_TYPE', 'topic'),
+                    'passive' => false,
+                    'durable' => true,
+                    'auto_delete' => false,
+                ],
+            ],
+            'after_commit' => false,
+        ],
+
         'database' => [
             'driver' => 'database',
             'connection' => env('DB_QUEUE_CONNECTION'),

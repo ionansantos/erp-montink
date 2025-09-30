@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    librabbitmq-dev \
+    libssh-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -32,6 +34,10 @@ RUN mkdir -p /home/$user/.composer && \
 RUN pecl install -o -f redis \
     &&  rm -rf /tmp/pear \
     &&  docker-php-ext-enable redis
+
+# NOVO: Instala e habilita a extensão php-amqp para comunicação eficiente com RabbitMQ
+RUN pecl install amqp \
+    && docker-php-ext-enable amqp
 
 # Set working directory
 WORKDIR /var/www

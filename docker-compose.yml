@@ -13,6 +13,7 @@ services:
     depends_on:
       - redis
       - db
+      - rabbitmq
     networks:
       - laravel
 
@@ -63,6 +64,44 @@ services:
       - db
     networks:
       - laravel
+      
+  # Novo Serviço: Laravel Queue Worker
+  # Este contêiner é dedicado a rodar o comando 'php artisan queue:work'
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - rabbitmq
+    command: php artisan queue:work rabbitmq --tries=3 --timeout=90
+    networks:
+      - laravel
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq 
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - laravel
+
+volumes:
+  rabbitmq_data:
 
 networks:
   laravel:
